@@ -63,9 +63,23 @@ function getTextWithTimestamps(text){
 function getTextWithHighlights(text){
     let lines = text.split('\n');
     lines = lines.map(line => {
-        var keyWords = getAllKeyWords(line);
-        for (var word of keyWords) {
-            line = line.replace(word, `<span style='color: red;'>${word}</span>`);
+        const keyWords = getAllKeyWords(line);
+        for (const keyWord of keyWords) {
+            let color = "red";
+            const keyWordText = keyWord.replace("#", "");
+            const workItemNumber = parseInt(keyWordText);
+
+            if(!isNaN(workItemNumber)) {
+                color = "blue";
+            }
+            else if(keyWordText.toLowerCase() == "meeting"){
+                color = "orange";
+            }
+            else{
+                color = "red";
+            }
+
+            line = line.replace(keyWord, `<span style='color: ${color};'>${keyWord}</span>`);
         }
         return line;
     });
@@ -148,21 +162,36 @@ function getSummaryCollection(text) {
  * @returns {string}
  */
 function getSummaryText(summaryCollection){
-    let summaryText = "Summary:<br/>";
+    let summaryText = "Tasks:<br/>";
+    let totalTaskMinutes = 0;
+    let totalMeetingMinutes = 0;
     for (const key in summaryCollection) {
         const minutes = summaryCollection[key];
-        const hours = Math.floor(minutes / 60);
-        const remainingMinutes = minutes % 60;
-
-        let workItemText = key;
-        const workItemNumber = parseInt(workItemText.replace("#", ""));
+        const itemText = key.replace("#", "");
+        const workItemNumber = parseInt(itemText);
         if(!isNaN(workItemNumber)) {
-            workItemText = `<a href='https://tfs.clarkinc.biz/DefaultCollection/Shipment%20Telemetrics/_workitems/edit/${workItemNumber}' target='_blank'>${workItemText}</a>`;
+            const hours = Math.floor(minutes / 60);
+            const remainingMinutes = minutes % 60;
+            totalTaskMinutes += minutes;
+            const workItemText = `#${itemText} (<a href='https://tfs.clarkinc.biz/DefaultCollection/Shipment%20Telemetrics/_workitems/edit/${workItemNumber}' target='_blank'>Link</a>)`;
+            summaryText += `${workItemText}: ${hours}h ${remainingMinutes}m<br/>`;
         }
-        
-        summaryText += `${workItemText}: ${hours}h ${remainingMinutes}m<br/>`;
+        else if(itemText.toLowerCase() == "meeting") {
+            totalMeetingMinutes += minutes;
+        }
     }
+
+    summaryText += `<br/>`;
+    summaryText += `Total Task Time: ${getTimeSpentString(totalTaskMinutes)}<br/>`;
+    summaryText += `Total Meeting Time: ${getTimeSpentString(totalMeetingMinutes)}<br/>`;
+
     return summaryText;
+}
+
+function getTimeSpentString(minutes){
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return `${hours}h ${remainingMinutes}m`;
 }
 
 // Initialize the highlighted view on page load.

@@ -173,7 +173,7 @@ function getSummaryText(summaryCollection){
             const hours = Math.floor(minutes / 60);
             const remainingMinutes = minutes % 60;
             totalTaskMinutes += minutes;
-            const workItemText = `#${itemText} (<a href='https://tfs.clarkinc.biz/DefaultCollection/Shipment%20Telemetrics/_workitems/edit/${workItemNumber}' target='_blank'>Link</a>)`;
+            const workItemText = `#${itemText}`;
             summaryText += `${workItemText}: ${hours}h ${remainingMinutes}m<br/>`;
         }
         else if(itemText.toLowerCase() == "meeting") {

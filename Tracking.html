@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Text Highlighter</title>
@@ -8,6 +9,7 @@
       font-family: monospace !important;
       font-size: 16px !important;
     }
+
     #editor-container {
       position: relative;
       width: 100%;
@@ -15,6 +17,7 @@
       margin: 10px auto;
       border: 1px solid #ccc;
     }
+
     #highlight {
       position: absolute;
       top: 0;
@@ -26,6 +29,7 @@
       word-wrap: break-word;
       color: black;
     }
+
     #editor {
       position: absolute;
       top: 0;
@@ -42,6 +46,7 @@
       outline: none;
       resize: none;
     }
+
     #summary-container {
       position: relative;
       width: 100%;
@@ -49,6 +54,7 @@
       margin: 10px auto;
       border: 1px solid #ccc;
     }
+
     #summary {
       position: absolute;
       top: 0;
@@ -59,15 +65,73 @@
     }
   </style>
 </head>
+
 <body>
   <div id="editor-container">
     <div id="highlight"></div>
     <textarea id="editor" spellcheck="false" oninput="updateHighlight()"></textarea>
   </div>
+  <button onclick="submitChanges()">Submit</button>
+  <button popovertarget="configure-popover">Configure</button>
   <div id="summary-container">
     <div id="summary">Hello</div>
   </div>
 
+  <div popover id="configure-popover">
+    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-bottom: 15px;">
+      <label for="config-ado">Azure Devops Base URL:</label>
+      <input type="text" id="config-ado" placeholder="Enter ADO URL" />
+
+      <label for="config-ado-pat">Azure Devops Personal Access Token:</label>
+      <input type="password" id="config-ado-pat" placeholder="Enter ADO PAT" />
+
+      <label for="config-ado-org">Azure Devops Organization:</label>
+      <input type="text" id="config-ado-org" placeholder="Enter ADO Organization" />
+
+      <label for="config-ado-project">Azure Devops Project:</label>
+      <input type="text" id="config-ado-project" placeholder="Enter ADO Project" />
+
+      <label for="config-ado-username">Azure Devops Username:</label>
+      <input type="text" id="config-ado-username" placeholder="Enter ADO Username" />
+    </div>
+    <button onclick="applyConfig()">Apply</button>
+
+    <script>
+      function applyConfig() {
+        const adoUrl = document.getElementById('config-ado').value;
+        const adoPat = document.getElementById('config-ado-pat').value;
+        const adoOrg = document.getElementById('config-ado-org').value;
+        const adoProject = document.getElementById('config-ado-project').value;
+        const adoUsername = document.getElementById('config-ado-username').value;
+
+        // Store values in localStorage for persistence
+        localStorage.setItem('ado-config', JSON.stringify({
+          url: adoUrl,
+          pat: adoPat,
+          org: adoOrg,
+          project: adoProject,
+          username: adoUsername
+        }));
+
+        // Close the popover
+        document.getElementById('configure-popover').hidePopover();
+      }
+
+      // Load saved values when page loads
+      document.addEventListener('DOMContentLoaded', () => {
+        const config = JSON.parse(localStorage.getItem('ado-config'));
+        if (config) {
+          document.getElementById('config-ado').value = config.url || '';
+          document.getElementById('config-ado-pat').value = config.pat || '';
+          document.getElementById('config-ado-org').value = config.org || '';
+          document.getElementById('config-ado-project').value = config.project || '';
+          document.getElementById('config-ado-username').value = config.username || '';
+        }
+      });
+    </script>
+  </div>
+
   <script type="text/javascript" src="js/tracking.js"></script>
 </body>
+
 </html>

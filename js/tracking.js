@@ -210,10 +210,18 @@ function getWorkItems(text) {
         const taskDescription = segments[1].replace(keyWord, "").trim();
         
         if(workItems[workItemNumber]) {
-            workItems[workItemNumber].push({
-                taskName: taskDescription,
-                taskTimeMinutes: deltaTimeMinutes
-            });
+            const workItemTasks = workItems[workItemNumber];
+
+            const existingTask = workItemTasks.find(task => task.taskName === taskDescription);
+            if (existingTask) {
+                existingTask.taskTimeMinutes += deltaTimeMinutes;
+            }
+            else{
+                workItems[workItemNumber].push({
+                    taskName: taskDescription,
+                    taskTimeMinutes: deltaTimeMinutes
+                });
+            }
         }
         else {
             workItems[workItemNumber] = [{
@@ -252,7 +260,8 @@ async function submitChanges(){
             taskName,
             taskTimeRounded: Math.round(taskTimeMinutes / 15) * 15 / 60
         }))
-    });
+    })
+    .filter(task => task.taskTimeRounded > 0);
 
     const workItemDisplayText = workItemTasks.map(({ parentWorkItemNumber, taskName, taskTimeRounded }) => {
         return `Work Item #${parentWorkItemNumber}: ${taskName} (${taskTimeRounded}h)`;

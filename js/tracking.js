@@ -43,10 +43,7 @@ function getTextWithTimestamps(text){
         var segments = line.split(" - ");
 
         if (segments.length == 1) {
-            //Get current date in format "11:00 AM"
-            var date = new Date();
-            var options = { hour: '2-digit', minute: '2-digit', hour12: true };
-            var time = date.toLocaleTimeString([], options);
+            var time = getCurrentTimeString();
 
             return `${time} - `;
         }
@@ -54,6 +51,13 @@ function getTextWithTimestamps(text){
         return line
     })
     return lines.join('\n');
+}
+
+//Get current date in format "11:00 AM"
+function getCurrentTimeString(){
+    var date = new Date();
+    var options = { hour: '2-digit', minute: '2-digit', hour12: true };
+    return date.toLocaleTimeString([], options);
 }
 
 /**
@@ -341,9 +345,14 @@ async function submitChanges(){
             const newTask = await createTaskWorkItem(task.parentWorkItemNumber, task.taskName, task.taskTimeRounded);
             console.log(`Created new task #${newTask.id}`, newTask);
         }
-
     }
 
+    alert("Changes submitted successfully!");
+
+    //Add submit message to log
+    const editor = document.getElementById('editor');
+    editor.value += `\n${getCurrentTimeString()} - Submitted Changes To ADO`
+    updateHighlight();
 }
 
 async function getWorkitem(workItemId) {
